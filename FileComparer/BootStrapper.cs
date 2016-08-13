@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FileComparer
 {
@@ -33,7 +36,7 @@ namespace FileComparer
                 return;
             }
 
-            var duplicates = fileProcessor.GetFileDuplicatesSorted();
+            var duplicates = this.DoLongRunningTask(fileProcessor.GetFileDuplicatesSorted);
             if (duplicates.Any())
             {
                 this.output.WriteLine("Group(s) of equal files.");
@@ -45,6 +48,20 @@ namespace FileComparer
             }
 
             this.output.WriteLine("Done!");
+        }
+
+        private T DoLongRunningTask<T>(Func<T> func)
+        {
+            this.output.WriteLine("Working...");
+            var task = Task.Run(func);
+            while (!task.IsCompleted)
+            {
+                this.output.Write(".");
+                Thread.Sleep(1000);
+            }
+
+            this.output.WriteLine(string.Empty);
+            return task.Result;
         }
     }
 }
