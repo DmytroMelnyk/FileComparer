@@ -10,7 +10,7 @@ namespace FileComparer
     {
         private readonly Lazy<List<FileInfoWrapper>> allDistinctItemsToProcess;
 
-        private readonly Lazy<IList<IEnumerable<FileInfoWrapper>>> fileDuplicates;
+        private readonly Lazy<IList<IEnumerable<FileInfoWrapper>>> fileDuplicatesSorted;
 
         public FileProcessor(
             Func<string, FileInfoWrapper> fileInfoWrapperFactory,
@@ -20,8 +20,8 @@ namespace FileComparer
                 () => AllDistinctItemsToProcessFactory(fileInfoWrapperFactory, processorData),
                 isThreadSafe: true);
 
-            this.fileDuplicates = new Lazy<IList<IEnumerable<FileInfoWrapper>>>(
-                () => FileDuplicatesFactory(this.GetAllDistinctItemsToProcess()),
+            this.fileDuplicatesSorted = new Lazy<IList<IEnumerable<FileInfoWrapper>>>(
+                () => FileDuplicatesSortedFactory(this.GetAllDistinctItemsToProcess()),
                 isThreadSafe: true);
         }
 
@@ -30,9 +30,9 @@ namespace FileComparer
             return this.allDistinctItemsToProcess.Value;
         }
 
-        public IList<IEnumerable<FileInfoWrapper>> GetFileDuplicates()
+        public IList<IEnumerable<FileInfoWrapper>> GetFileDuplicatesSorted()
         {
-            return this.fileDuplicates.Value;
+            return this.fileDuplicatesSorted.Value;
         }
 
         private static List<FileInfoWrapper> AllDistinctItemsToProcessFactory(Func<string, FileInfoWrapper> fileInfoWrapperFactory, IProcessorData processorData)
@@ -55,7 +55,7 @@ namespace FileComparer
                 .ToList();
         }
 
-        private static IList<IEnumerable<FileInfoWrapper>> FileDuplicatesFactory(IEnumerable<FileInfoWrapper> distinctFileInfoWrappers)
+        private static IList<IEnumerable<FileInfoWrapper>> FileDuplicatesSortedFactory(IEnumerable<FileInfoWrapper> distinctFileInfoWrappers)
         {
             return distinctFileInfoWrappers
                 .GroupBy(item => item, FileInfoWrapperComparer.LengthComparer)
@@ -64,6 +64,7 @@ namespace FileComparer
                 .AsParallel()
                 .GroupBy(item => item, FileInfoWrapperComparer.HashComparer)
                 .Where(MoreThanOneElementInGroup)
+                .OrderByDescending(item => item.Key.FileInfo.Length)
                 .Select(item => item.Select(subItem => subItem))
                 .ToList();
         }

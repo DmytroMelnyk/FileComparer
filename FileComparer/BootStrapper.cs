@@ -33,7 +33,7 @@ namespace FileComparer
                 return;
             }
 
-            var duplicates = fileProcessor.GetFileDuplicates();
+            var duplicates = fileProcessor.GetFileDuplicatesSorted();
             if (duplicates.Any())
             {
                 this.output.WriteLine("Group(s) of equal files.");
