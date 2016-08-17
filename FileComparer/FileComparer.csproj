@@ -39,6 +39,10 @@
       <HintPath>..\packages\Autofac.4.0.0\lib\net451\Autofac.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
       <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
       <Private>True</Private>
@@ -62,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BootStrapper.cs" />
+    <Compile Include="FileInfoWrapper\FileInfoHashFactoryProviders\SHA3FileHashFactoryProvider.cs" />
     <Compile Include="FileProcessor\CommandLineOptions.cs" />
     <Compile Include="FileInfoWrapper\FileInfoWrapper.cs" />
     <Compile Include="FileInfoWrapper\FileInfoWrapperComparer.cs" />

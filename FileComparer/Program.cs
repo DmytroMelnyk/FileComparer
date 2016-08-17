@@ -25,6 +25,7 @@ namespace FileComparer
 
         private static int Main(string[] args)
         {
+            args = new[] { "-i", @"C:\test" };
             try
             {
                 var options = new CommandLineOptions();
