@@ -4,6 +4,8 @@ using System.Security.Cryptography;
 
 namespace FileComparer
 {
+    using Org.BouncyCastle.Utilities;
+
     public class MD5FileHashFactoryProvider : IFileHashFactoryProvider
     {
         public Func<FileInfo, byte[]> HashFactory { get; } = fileInfo =>

@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace FileComparer
 {
+    using System.Diagnostics;
+
     public class BootStrapper
     {
         private readonly Func<IProcessorData, FileProcessor> fileProcessorFactory;
@@ -20,10 +22,12 @@ namespace FileComparer
             this.output = output;
         }
 
-        public void Run(CommandLineOptions options)
+        public async void Run(CommandLineOptions options)
         {
             var fileProcessor = this.fileProcessorFactory(options);
 
+            var sw = new Stopwatch();
+            sw.Start();
             var allItems = fileProcessor.GetAllDistinctItemsToProcess();
             if (allItems.Skip(1).Any())
             {
@@ -36,7 +40,7 @@ namespace FileComparer
                 return;
             }
 
-            var duplicates = this.DoLongRunningTask(fileProcessor.GetFileDuplicatesSorted);
+            var duplicates = await this.DoLongRunningTask(fileProcessor.GetFileDuplicatesSorted);
             if (duplicates.Any())
             {
                 this.output.WriteLine("Group(s) of equal files.");
@@ -47,21 +51,15 @@ namespace FileComparer
                 this.output.WriteLine("All files are distinct.");
             }
 
+            sw.Stop();
+            Console.WriteLine("Action take {0} ms", sw.ElapsedMilliseconds);
             this.output.WriteLine("Done!");
         }
 
-        private T DoLongRunningTask<T>(Func<T> func)
+        private Task<T> DoLongRunningTask<T>(Func<T> func)
         {
             this.output.WriteLine("Working...");
-            var task = Task.Run(func);
-            while (!task.IsCompleted)
-            {
-                this.output.Write(".");
-                Thread.Sleep(1000);
-            }
-
-            this.output.WriteLine(string.Empty);
-            return task.Result;
+            return Task.Run(func);
         }
     }
 }
